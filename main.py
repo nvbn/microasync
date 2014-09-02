@@ -1,32 +1,24 @@
-import reactive
-import core
+from microasync.csp import loop, go, Delay
+from microasync.device import leds, get_switch
 
 
-@core.go
-def toggle_leds():
-    for led in range(1, 5):
-        yield reactive.Led(led).toggle()
-    return 'OK'
-
-
-@core.go
-def main():
-    switch = reactive.Switch()
+@go
+def on_delay():
     while True:
         for led in range(1, 5):
-            yield switch.clicked()
-            yield reactive.Led(led).toggle()
+            yield leds.put((led, 'toggle'))
+            yield Delay(1)
 
 
-@core.go
-def on_timer():
-    timer = reactive.Timer(4, freq=1)
+@go
+def on_switch():
+    switch = get_switch()
     while True:
-        yield timer.when()
-        result = yield toggle_leds()
-        print(result)
+        for led in range(1, 5):
+            yield switch.get()
+            yield leds.put((led, 'off'))
 
 
-main()
-on_timer()
-core.loop()
+on_delay()
+on_switch()
+loop()
