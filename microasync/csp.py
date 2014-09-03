@@ -136,3 +136,13 @@ class Delay(Promise):
         self.delivered = self._start + self._sec < time()
         if self.delivered:
             processable.remove(self)
+
+
+class ChannelProducer(object):
+    def __init__(self, chan):
+        self._chan = chan
+        self._reserved_clone = chan
+
+    def get_clone(self):
+        self._reserved_clone, self._chan = clone(self._reserved_clone, 2)
+        return self._chan

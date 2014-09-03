@@ -1,5 +1,6 @@
 import pyb
-from microasync.csp import Channel, go, SlidingChannel, clone, Delay
+from microasync.csp import Channel, go, SlidingChannel, Delay,\
+    ChannelProducer
 from microasync.utils import Atom
 
 
@@ -15,13 +16,11 @@ _leds_handler()
 
 
 _switch = SlidingChannel()
-_reserved_clone = Atom(_switch)
+_switch_producer = ChannelProducer(_switch)
 
 
 def get_switch():
-    reserved, new = clone(_reserved_clone.value, 2)
-    _reserved_clone.reset(reserved)
-    return new
+    return _switch_producer.get_clone()
 
 
 _switch_atom = Atom(False)
@@ -42,3 +41,19 @@ def _switch_handler():
     aux()
 
 _switch_handler()
+
+
+_timers = {}
+
+
+def get_timer_counter(*args, **kwargs):
+    chan = SlidingChannel()
+    timer = pyb.Timer(*args, **kwargs)
+
+    @go
+    def aux():
+        while True:
+            yield chan.put(timer.counter())
+            yield Delay(0)
+    aux()
+    return chan

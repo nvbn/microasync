@@ -2,7 +2,7 @@ from unittest import TestCase
 from time import sleep
 from microasync.utils import WithEquality, Promise, Atom
 from microasync.csp import Channel, SlidingChannel, GoBlock, go, process_all,\
-    clone, Delay
+    clone, Delay, ChannelProducer
 
 
 class WithEqualityTestCase(TestCase):
@@ -213,3 +213,18 @@ class DelayTestCase(TestCase):
         sleep(1)
         process_all()
         self.assertTrue(delay.delivered)
+
+
+class ChanProducerTestCase(TestCase):
+
+    def test_should_work(self):
+        chan = Channel()
+        producer = ChannelProducer(chan)
+        clones = [producer.get_clone() for _ in range(5)]
+        chan.put(12)
+        process_all()
+        for chan_clone in clones:
+            prom = chan_clone.get()
+            while not prom.delivered:
+                process_all()
+            self.assertEqual(prom.value, 12)

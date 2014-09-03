@@ -1,5 +1,5 @@
 from microasync.csp import loop, go, Delay
-from microasync.device import leds, get_switch
+from microasync.device import leds, get_switch, get_timer_counter
 
 
 @go
@@ -19,6 +19,16 @@ def on_switch():
             yield leds.put((led, 'off'))
 
 
+@go
+def on_timer_counter():
+    counter = get_timer_counter(2, prescaler=83, period=0x3fffffff)
+    while True:
+        val = yield counter.get()
+        print(val)
+        yield Delay(1)
+
+
 on_delay()
 on_switch()
+on_timer_counter()
 loop()
