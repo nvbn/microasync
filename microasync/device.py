@@ -38,7 +38,7 @@ def _switch_handler():
             if _switch_atom.value:
                 yield _switch.put(True)
                 _switch_atom.reset(False)
-            yield Delay(1)
+            yield Delay(0)
     aux()
 
 _switch_handler()

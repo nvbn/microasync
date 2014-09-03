@@ -2,8 +2,7 @@ from microasync.utils import Promise, WithEquality
 from time import time, sleep
 
 
-channels = []
-blocks = []
+processable = []
 
 
 class Channel(WithEquality):
@@ -15,7 +14,7 @@ class Channel(WithEquality):
         self._put_queue = []
         self._limit = limit
         self.closed = False
-        channels.append(self)
+        processable.append(self)
         self.clones = []
 
     def get(self):
@@ -73,7 +72,7 @@ class GoBlock(Promise):
         self._gen = gen
         self._last_promise = Promise()
         self._last_promise.delivery(None)
-        blocks.append(self)
+        processable.append(self)
 
     @property
     def parked(self):
@@ -91,7 +90,7 @@ class GoBlock(Promise):
                 self._close()
 
     def _close(self):
-        blocks.remove(self)
+        processable.remove(self)
 
 
 def go(fnc):
@@ -101,10 +100,8 @@ def go(fnc):
 
 
 def process_all():
-    for channel in channels:
-        channel.process()
-    for block in blocks:
-        block.process()
+    for item in processable[:]:
+        item.process()
 
 
 def loop():
@@ -133,9 +130,9 @@ class Delay(Promise):
         self._start = time()
         self._sec = sec
         self.delivered = False
-        blocks.append(self)
+        processable.append(self)
 
     def process(self):
         self.delivered = self._start + self._sec < time()
         if self.delivered:
-            blocks.remove(self)
+            processable.remove(self)

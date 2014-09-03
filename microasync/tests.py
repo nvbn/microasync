@@ -2,7 +2,7 @@ from unittest import TestCase
 from time import sleep
 from microasync.utils import WithEquality, Promise, Atom
 from microasync.csp import Channel, SlidingChannel, GoBlock, go, process_all,\
-    clone, Delay, go_loop
+    clone, Delay
 
 
 class WithEqualityTestCase(TestCase):
@@ -73,8 +73,8 @@ class ChannelTestCase(TestCase):
         chan = Channel(limit=5)
         put_proms = [chan.put(x) for x in range(5)]
         get_proms = [chan.get() for _ in range(5)]
-        chan.process()
         for prom in put_proms:
+            process_all()
             self.assertTrue(prom.delivered)
             self.assertTrue(prom.value)
         for n, prom in enumerate(get_proms):
@@ -98,10 +98,15 @@ class SlidingChannelTestCase(TestCase):
 
     def test_channel_with_limit(self):
         chan = SlidingChannel(limit=5)
-        put_proms = [chan.put(x) for x in range(10)]
-        get_proms = [chan.get() for _ in range(10)]
-        chan.process()
+
+        def _and_process(x):
+            process_all()
+            return x
+
+        put_proms = [_and_process(chan.put(x)) for x in range(10)]
+        get_proms = [_and_process(chan.get()) for _ in range(10)]
         for n, prom in enumerate(put_proms):
+            process_all()
             self.assertTrue(prom.delivered)
             self.assertTrue(prom.value)
         for n, prom in enumerate(get_proms):
