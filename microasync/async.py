@@ -66,9 +66,9 @@ class SlidingChannel(Channel):
         return True
 
 
-class GoBlock(Promise):
+class CoroutineBlock(Promise):
     def __init__(self, gen):
-        super(GoBlock, self).__init__()
+        super(CoroutineBlock, self).__init__()
         self._gen = gen
         self._last_promise = Promise()
         self._last_promise.delivery(None)
@@ -93,9 +93,9 @@ class GoBlock(Promise):
         processable.remove(self)
 
 
-def go(fnc):
+def coroutine(fnc):
     def wrapper(*args, **kwargs):
-        return GoBlock(fnc(*args, **kwargs))
+        return CoroutineBlock(fnc(*args, **kwargs))
     return wrapper
 
 
@@ -113,7 +113,7 @@ def loop():
 def clone(chan, n, chan_type=SlidingChannel):
     result_chans = [chan_type() for _ in range(n)]
 
-    @go
+    @coroutine
     def aux():
         while True:
             val = yield chan.get()

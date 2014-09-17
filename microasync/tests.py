@@ -1,7 +1,7 @@
 from unittest import TestCase
 from time import sleep
 from microasync.utils import WithEquality, Promise, Atom
-from microasync.csp import Channel, SlidingChannel, GoBlock, go, process_all,\
+from microasync.async import Channel, SlidingChannel, CoroutineBlock, coroutine, process_all,\
     clone, Delay, ChannelProducer
 
 
@@ -117,14 +117,14 @@ class SlidingChannelTestCase(TestCase):
                 self.assertEqual(prom.value, n + 5)
 
 
-class GoBlockTestCase(TestCase):
+class CoroutineBlockTestCase(TestCase):
 
     def test_block_parking(self):
         def fnc():
             yield Promise()
             yield Promise()
 
-        block = GoBlock(fnc())
+        block = CoroutineBlock(fnc())
         self.assertFalse(block.parked)
         block.process()
         self.assertTrue(block.parked)
@@ -137,7 +137,7 @@ class GoBlockTestCase(TestCase):
             self.assertEqual(val, 50)
             return 12
 
-        block = GoBlock(fnc())
+        block = CoroutineBlock(fnc())
         block.process()
         block._last_promise.delivery(50)
         block.process()
@@ -147,16 +147,16 @@ class GoBlockTestCase(TestCase):
     def test_value_passing_when_fnc(self):
         def fnc():
             return 52
-        block = GoBlock(fnc())
+        block = CoroutineBlock(fnc())
         block.process()
         self.assertTrue(block.delivered)
         self.assertEqual(block.value, 52)
 
 
-class GoDecoratorTestCase(TestCase):
+class CoroutineDecoratorTestCase(TestCase):
 
     def test_should_work(self):
-        @go
+        @coroutine
         def inc(x):
             return x + 1
 
@@ -164,7 +164,7 @@ class GoDecoratorTestCase(TestCase):
         inc_val.process()
         self.assertTrue(inc_val.delivered)
 
-        @go
+        @coroutine
         def range_fn(y):
             x = 0
             result = [x]
@@ -184,7 +184,7 @@ class CloneTestCase(TestCase):
     def _assert_should_work(self, channel_type):
         done = Promise()
 
-        @go
+        @coroutine
         def aux():
             chan = Channel()
             chans = clone(chan, 5, channel_type)
