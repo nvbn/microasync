@@ -1,5 +1,5 @@
 from microasync.async import loop, coroutine, Delay
-from microasync.device import leds, get_switch, get_timer_counter
+from microasync.device import leds, get_switch
 
 
 @coroutine
@@ -19,16 +19,6 @@ def on_switch():
             yield leds.put((led, 'off'))
 
 
-@coroutine
-def on_timer_counter():
-    counter = get_timer_counter(2, prescaler=83, period=0x3fffffff)
-    while True:
-        val = yield counter.get()
-        print(val)
-        yield Delay(1)
-
-
 on_delay()
 on_switch()
-on_timer_counter()
 loop()

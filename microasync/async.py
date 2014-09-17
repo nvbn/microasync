@@ -146,3 +146,17 @@ class ChannelProducer(object):
     def get_clone(self):
         self._reserved_clone, self._chan = clone(self._reserved_clone, 2)
         return self._chan
+
+
+def select(*chans):
+    chan = Channel()
+
+    @coroutine
+    def aux(chan_):
+        val = yield chan_.get()
+        yield chan.put((chan_, val))
+
+    for promise in chans:
+        aux(promise)
+
+    return chan
