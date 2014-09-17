@@ -40,3 +40,28 @@ def _leds_handler():
         led, action = yield leds.get()
         getattr(pyb.LED(led), action)()
 _leds_handler()
+
+
+servo_chans = {}
+
+
+def get_servo(num):
+    if not num in servo_chans:
+        servo_chans[num] = (Channel(), SlidingChannel())
+    servo = pyb.Servo(num)
+
+    @coroutine
+    def set_aux():
+        while True:
+            val = yield servo_chans[num][0].get()
+            servo.angle(val)
+    set_aux()
+
+    @coroutine
+    def get_aux():
+        while True:
+            val = servo.angle()
+            yield servo_chans[num][1].put(val)
+            yield Delay(0)
+    get_aux()
+    return servo_chans[num]
