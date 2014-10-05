@@ -153,8 +153,9 @@ def select(*chans):
 
     @coroutine
     def aux(chan_):
-        val = yield chan_.get()
-        yield chan.put((chan_, val))
+        while True:
+            val = yield chan_.get()
+            yield chan.put((chan_, val))
 
     for promise in chans:
         aux(promise)

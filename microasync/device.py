@@ -65,3 +65,20 @@ def get_servo(num):
             yield Delay(0)
     get_aux()
     return servo_chans[num]
+
+
+accel = SlidingChannel()
+accel_run = Atom(False)
+
+
+def get_accel():
+    @coroutine
+    def aux():
+        dev = pyb.Accel()
+        while True:
+            yield accel.put(dev.filtered_xyz())
+            yield Delay(0)
+
+    if not accel_run.value:
+        aux()
+    return accel
