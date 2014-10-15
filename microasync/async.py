@@ -137,6 +137,9 @@ class Delay(Promise):
         if self.delivered:
             processable.remove(self)
 
+    def get(self):
+        return Delay(self._sec)
+
 
 class ChannelProducer(object):
     def __init__(self, chan):
@@ -161,3 +164,27 @@ def select(*chans):
         aux(promise)
 
     return chan
+
+
+def as_chan(create_chan):
+    def decorator(fn):
+        def wrapped(*args, **kwargs):
+            chan = create_chan()
+            coroutine(fn)(chan, *args, **kwargs)
+            return chan
+        return wrapped
+    return decorator
+
+
+def do_all(*chans):
+    result_chan = Channel()
+
+    @coroutine
+    def aux():
+        result = []
+        for ch in chans:
+            result.append((yield ch))
+        yield result_chan.put(result)
+    aux()
+    return result_chan.get()
+

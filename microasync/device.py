@@ -1,6 +1,6 @@
 import pyb
 from microasync.async import coroutine, SlidingChannel, Delay,\
-    ChannelProducer, Channel
+    ChannelProducer, Channel, as_chan
 from microasync.utils import Atom
 
 _switch = SlidingChannel()
@@ -82,3 +82,19 @@ def get_accel():
     if not accel_run.value:
         aux()
     return accel
+
+
+@as_chan(SlidingChannel)
+def get_input_pin(chan, pin_name):
+    pin = pyb.Pin(pin_name, mode=pyb.Pin.INP)
+    while True:
+        yield chan.put(pin.value())
+        yield Delay(0)
+
+
+@as_chan(Channel)
+def get_output_pin(chan, pin_name):
+    pin = pyb.Pin(pin_name, mode=pyb.Pin.OUT_PP)
+    while True:
+        value = yield chan.get()
+        pin.value(value)
