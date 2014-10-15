@@ -3,7 +3,7 @@ from microasync.device import get_switch, get_output_pin
 
 
 @as_chan(Channel)
-def get_3_led(chan, left, right):
+def get_bicolar_led(chan, left, right):
     left_pin = get_output_pin(left)
     right_pin = get_output_pin(right)
     while True:
@@ -38,9 +38,11 @@ def switchable_filter(chan, orig_chan, fn):
 
 @coroutine
 def main():
-    leds = (switchable_filter(get_3_led('X1', 'X2'), lambda msg: msg != 'red'),
-            switchable_filter(get_3_led('X3', 'X4'), lambda msg: msg == 'red'))
+    first_led = switchable_filter(get_bicolar_led('X1', 'X2'),
+                                  lambda msg: msg != 'red')
+    second_led = switchable_filter(get_bicolar_led('X3', 'X4'),
+                                   lambda msg: msg == 'red')
     while True:
-        for led in leds:
+        for led in (first_led, second_led):
             for mode in ('red', 'green', 'yellow', 'none'):
                 yield led.put(mode)
