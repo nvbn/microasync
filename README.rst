@@ -3,6 +3,8 @@ microasync
 
 Green threads and CSP for micropython.
 
+`Api documentation<http://microasync.readthedocs.org/>`_.
+
 
 Installation
 -------------
