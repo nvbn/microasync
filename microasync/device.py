@@ -2,7 +2,14 @@
 try:
     import pyb
 except ImportError:
-    pyb = object()  # for generating documentation
+    class FakePyb(object):
+        def __getattr__(self, item):
+            return self
+
+        def __call__(self, *args, **kwargs):
+            return self
+
+    pyb = FakePyb()  # for generating documentation
 
 from microasync.async import coroutine, SlidingChannel, Delay,\
     ChannelProducer, Channel, as_chan
