@@ -1,3 +1,4 @@
+"""Helpers for internal use only!"""
 try:
     import pyb
 except ImportError:
@@ -13,7 +14,7 @@ except ImportError:
 
 
 class WithEquality(object):
-    """Class for avoiding micropython limitations with objects eqaulity."""
+    """Class for avoiding micropython limitations with objects equality."""
 
     def __init__(self):
         self._id = pyb.rng()
