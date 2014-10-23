@@ -3,7 +3,7 @@ microasync
 
 Green threads and CSP for micropython.
 
-`Api documentation<http://microasync.readthedocs.org/>`_.
+`Api documentation <http://microasync.readthedocs.org/>`_.
 
 
 Installation
@@ -40,7 +40,7 @@ For example, script that prints `ok!` every ten seconds:
 
 More examples:
 
-- `examples in repo<https://github.com/nvbn/microasync/tree/master/examples/>`_;
-- `green threads on pyboard<http://nvbn.github.io/2014/09/22/green-threads-on-pyboard/>`_;
-- `csp on pyboard<http://nvbn.github.io/2014/10/05/csp-on-pyboard/>`_;
-- `frp on pyboard<http://nvbn.github.io/2014/10/15/frp-on-pyboard/>`_.
+- `examples in repo <https://github.com/nvbn/microasync/tree/master/examples/>`_;
+- `green threads on pyboard <http://nvbn.github.io/2014/09/22/green-threads-on-pyboard/>`_;
+- `csp on pyboard <http://nvbn.github.io/2014/10/05/csp-on-pyboard/>`_;
+- `frp on pyboard <http://nvbn.github.io/2014/10/15/frp-on-pyboard/>`_.
