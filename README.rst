@@ -13,7 +13,7 @@ For installing run:
 
 .. code-block:: bash
 
-    pip-micropython install microasync
+    MICROPYPATH='path-to-pyboard' pip-micropython install microasync
 
 
 Basic usage
